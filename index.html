@@ -402,18 +402,20 @@
                                         <th class="p-2 border border-slate-300">NOMBRE DE INDICADOR</th>
                                         <th class="p-2 border border-slate-300">NOMBRE DEL REPORTE</th>
                                         <th class="p-2 border border-slate-300">CAMPO</th>
-                                        <th class="p-2 border border-slate-300">TIPO DE DATO</th>
                                         <th class="p-2 border border-slate-300">DATOS MAESTROS</th>
-                                        <th class="p-2 border border-slate-300">DATOS MUESTRA</th>
+                                        <th class="p-2 border border-slate-300">CAMPO MUESTRA</th>
+                                        <th class="p-2 border border-slate-300">DATOS MAESTROS MUESTRAS</th>
                                         <th class="p-2 border border-slate-300">PERIODICIDAD</th>
                                         <th class="p-2 border border-slate-300">ÁREA RESPONSABLE</th>
-                                        <th class="p-2 border border-slate-300">NOMBRE CRUCE</th>
+                                        <th class="p-2 border border-slate-300">NOMBRE</th>
+                                        <th class="p-2 border border-slate-300">CORREO</th>
                                         <th class="p-2 border border-slate-300">ORIGEN DE DATOS</th>
                                         <th class="p-2 border border-slate-300">HERRAMIENTA DE TRANSFORMACIÓN</th>
-                                        <th class="p-2 border border-slate-300">FÓRMULA/TRANSFORMACIÓN</th>
-                                        <th class="p-2 border border-slate-300">UBICACIÓN ACTUAL</th>
-                                        <th class="p-2 border border-slate-300">ID</th>
-                                        <th class="p-2 border border-slate-300">CAMPO DE LA TABLA</th>
+                                        <th class="p-2 border border-slate-300">FÓRMULA TRANSFORMACIÓN</th>
+                                        <th class="p-2 border border-slate-300">RUTA / UBICACIÓN ACTUAL</th>
+                                        <th class="p-2 border border-slate-300">BASE DE DATOS</th>
+                                        <th class="p-2 border border-slate-300">TABLA</th>
+                                        <th class="p-2 border border-slate-300">COLUMNA DE LA TABLA</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -435,19 +437,19 @@
                                             <p class="italic text-slate-500 text-xs mt-1">¿Cómo se llama la columna que muestra este dato intermedio?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">TIPO DE DATO:</p>
-                                            <p class="text-slate-600 text-xs">Clasifique el tipo de dato del campo (ej. Numérico, Texto, Fecha, Booleano).</p>
-                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué formato tiene este dato?</p>
-                                        </td>
-                                        <td class="p-2 border border-slate-300 align-top">
                                             <p class="font-semibold text-slate-700">DATOS MAESTROS:</p>
                                             <p class="text-slate-600 text-xs">Indique los datos maestros (ej. ID de Cliente, ID de Producto) de los cuales se deriva este campo.</p>
                                             <p class="italic text-slate-500 text-xs mt-1">¿De qué datos maestros proviene este campo?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">DATOS MUESTRA:</p>
-                                            <p class="text-slate-600 text-xs">Proporcione un ejemplo de valor para el campo (opcional, para referencia rápida).</p>
-                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué valor típico podríamos ver aquí?</p>
+                                            <p class="font-semibold text-slate-700">CAMPO MUESTRA:</p>
+                                            <p class="text-slate-600 text-xs">Proporcione un ejemplo de valor para el campo intermedio (opcional, para referencia rápida).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué valor típico podríamos ver aquí para el campo intermedio?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">DATOS MAESTROS MUESTRAS:</p>
+                                            <p class="text-slate-600 text-xs">Proporcione ejemplos de valores de los datos maestros que alimentan este campo intermedio.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué valores de datos maestros se usan para este campo?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
                                             <p class="font-semibold text-slate-700">PERIODICIDAD:</p>
@@ -460,9 +462,14 @@
                                             <p class="italic text-slate-500 text-xs mt-1">¿Quién es el dueño de negocio de este indicador?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">NOMBRE CRUCE:</p>
-                                            <p class="text-slate-600 text-xs">Cualquier denominación alternativa o relacionada del dato en otros sistemas o contextos.</p>
-                                            <p class="italic text-slate-500 text-xs mt-1">¿Se conoce este dato con otro nombre en otros sistemas?</p>
+                                            <p class="font-semibold text-slate-700">NOMBRE:</p>
+                                            <p class="text-slate-600 text-xs">Nombre de la persona o equipo de TI responsable de la implementación o mantenimiento del flujo de datos.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Quién es el contacto técnico?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">CORREO:</p>
+                                            <p class="text-slate-600 text-xs">Correo electrónico del responsable de TI.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es su correo?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
                                             <p class="font-semibold text-slate-700">ORIGEN DE DATOS:</p>
@@ -475,77 +482,88 @@
                                             <p class="italic text-slate-500 text-xs mt-1">¿Qué herramienta transforma el dato?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">FÓRMULA/TRANSFORMACIÓN:</p>
+                                            <p class="font-semibold text-slate-700">FÓRMULA TRANSFORMACIÓN:</p>
                                             <p class="text-slate-600 text-xs">Describa la lógica o fórmula aplicada para obtener el campo a partir de los datos maestros u otros datos.</p>
                                             <p class="italic text-slate-500 text-xs mt-1">¿Cómo se calcula este campo?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">UBICACIÓN ACTUAL:</p>
-                                            <p class="text-slate-600 text-xs">Dónde se encuentra el dato en la etapa actual del flujo (ej. Data Mart, Data Warehouse).</p>
-                                            <p class="italic text-slate-500 text-xs mt-1">¿Dónde está el dato ahora mismo en su flujo?</p>
+                                            <p class="font-semibold text-slate-700">RUTA / UBICACIÓN ACTUAL:</p>
+                                            <p class="text-slate-600 text-xs">Ruta o ubicación del archivo/directorio donde se encuentra el dato en su estado actual (ej. /data/reports/ventas/).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Dónde está el archivo o carpeta del dato?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">ID:</p>
-                                            <p class="text-slate-600 text-xs">Identificador único para el registro o la fila de datos.</p>
-                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es el identificador de este registro?</p>
+                                            <p class="font-semibold text-slate-700">BASE DE DATOS:</p>
+                                            <p class="text-slate-600 text-xs">Nombre de la base de datos donde reside el dato.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es la base de datos?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
-                                            <p class="font-semibold text-slate-700">CAMPO DE LA TABLA:</p>
-                                            <p class="text-slate-600 text-xs">El nombre de la columna en la tabla o sistema actual donde reside el dato.</p>
-                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se llama la columna en la tabla actual?</p>
+                                            <p class="font-semibold text-slate-700">TABLA:</p>
+                                            <p class="text-slate-600 text-xs">Nombre de la tabla dentro de la base de datos donde se encuentra el dato.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es la tabla?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">COLUMNA DE LA TABLA:</p>
+                                            <p class="text-slate-600 text-xs">Nombre de la columna específica en la tabla donde reside el dato.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es la columna específica?</p>
                                         </td>
                                     </tr>
                                     <!-- Ejemplos inventados para Plantilla 1 -->
                                     <tr class="border-b border-slate-200 bg-slate-50">
                                         <td class="p-2 border border-slate-300">Ingresos Netos por Región</td>
                                         <td class="p-2 border border-slate-300">Reporte de Rentabilidad Regional</td>
-                                        <td class="p-2 border border-slate-300">Monto_Ingresos_Netos</td>
-                                        <td class="p-2 border border-slate-300">DECIMAL</td>
-                                        <td class="p-2 border border-slate-300">ID_Producto, Precio_Venta, Descuento_Aplicado</td>
-                                        <td class="p-2 border border-slate-300">250,000.00</td>
+                                        <td class="p-2 border border-slate-300">Monto_Ingresos_Netos_Calculado</td>
+                                        <td class="p-2 border border-slate-300">ID_Cliente, Precio_Venta, Cantidad, Descuento</td>
+                                        <td class="p-2 border border-slate-300">250000.00</td>
+                                        <td class="p-2 border border-slate-300">C001, P001, 10, 0.05</td>
                                         <td class="p-2 border border-slate-300">Mensual</td>
                                         <td class="p-2 border border-slate-300">Finanzas</td>
-                                        <td class="p-2 border border-slate-300">Regional_Revenue</td>
+                                        <td class="p-2 border border-slate-300">Juan Pérez</td>
+                                        <td class="p-2 border border-slate-300">juan.perez@ejemplo.com</td>
                                         <td class="p-2 border border-slate-300">Sistema ERP, CRM</td>
                                         <td class="p-2 border border-slate-300">Talend ETL</td>
                                         <td class="p-2 border border-slate-300">SUM(Precio_Venta * Cantidad - Descuento) GROUP BY Region</td>
-                                        <td class="p-2 border border-slate-300">Data Mart Financiero</td>
-                                        <td class="p-2 border border-slate-300">FIN_REP_001</td>
+                                        <td class="p-2 border border-slate-300">/data/finance/reports/</td>
+                                        <td class="p-2 border border-slate-300">DW_Finanzas</td>
+                                        <td class="p-2 border border-slate-300">Fact_Ingresos</td>
                                         <td class="p-2 border border-slate-300">Net_Revenue_Region</td>
                                     </tr>
                                     <tr class="border-b border-slate-200">
-                                        <td class="p-2 border border-slate-300">Tiempo Promedio de Resolución</td>
-                                        <td class="p-2 border border-slate-300">Dashboard de Operaciones de Soporte</td>
-                                        <td class="p-2 border border-slate-300">Avg_Resolution_Time_Hours</td>
-                                        <td class="p-2 border border-slate-300">DECIMAL</td>
-                                        <td class="p-2 border border-slate-300">ID_Ticket, Fecha_Creacion_Ticket, Fecha_Cierre_Ticket</td>
-                                        <td class="p-2 border border-slate-300">4.5</td>
+                                        <td class="p-2 border border-slate-300">Tasa de Conversión Web</td>
+                                        <td class="p-2 border border-slate-300">Dashboard de Marketing Digital</td>
+                                        <td class="p-2 border border-slate-300">Conversion_Rate_Pct</td>
+                                        <td class="p-2 border border-slate-300">Visitas_Web, Conversiones_Venta</td>
+                                        <td class="p-2 border border-slate-300">0.03 (3%)</td>
+                                        <td class="p-2 border border-slate-300">10000, 300</td>
                                         <td class="p-2 border border-slate-300">Diario</td>
-                                        <td class="p-2 border border-slate-300">Soporte al Cliente</td>
-                                        <td class="p-2 border border-slate-300">Mean_Time_To_Resolve</td>
-                                        <td class="p-2 border border-slate-300">Sistema de Ticketing</td>
+                                        <td class="p-2 border border-slate-300">Marketing Digital</td>
+                                        <td class="p-2 border border-slate-300">Ana García</td>
+                                        <td class="p-2 border border-slate-300">ana.garcia@ejemplo.com</td>
+                                        <td class="p-2 border border-slate-300">Google Analytics, CRM</td>
                                         <td class="p-2 border border-slate-300">Python Script</td>
-                                        <td class="p-2 border border-slate-300">AVG(DATEDIFF(hour, Fecha_Creacion_Ticket, Fecha_Cierre_Ticket))</td>
-                                        <td class="p-2 border border-slate-300">Data Mart Operaciones</td>
-                                        <td class="p-2 border border-slate-300">OPS_DASH_002</td>
-                                        <td class="p-2 border border-slate-300">AvgResolutionHours</td>
+                                        <td class="p-2 border border-slate-300">(Conversiones_Venta / Visitas_Web) * 100</td>
+                                        <td class="p-2 border border-slate-300">/data/marketing/metrics/</td>
+                                        <td class="p-2 border border-slate-300">DW_Marketing</td>
+                                        <td class="p-2 border border-slate-300">Fact_Web_Analytics</td>
+                                        <td class="p-2 border border-slate-300">ConversionRate</td>
                                     </tr>
                                     <tr class="border-b border-slate-200 bg-slate-50">
-                                        <td class="p-2 border border-slate-300">Tasa de Rotación de Empleados</td>
-                                        <td class="p-2 border border-slate-300">Reporte Anual de RRHH</td>
-                                        <td class="p-2 border border-slate-300">Employee_Turnover_Rate</td>
-                                        <td class="p-2 border border-slate-300">DECIMAL</td>
-                                        <td class="p-2 border border-slate-300">ID_Empleado, Fecha_Contratacion, Fecha_Terminacion</td>
-                                        <td class="p-2 border border-slate-300">0.15 (15%)</td>
-                                        <td class="p-2 border border-slate-300">Anual</td>
-                                        <td class="p-2 border border-slate-300">Recursos Humanos</td>
-                                        <td class="p-2 border border-slate-300">Attrition_Rate</td>
-                                        <td class="p-2 border border-slate-300">Sistema de RRHH</td>
-                                        <td class="p-2 border border-slate-300">SQL Query</td>
-                                        <td class="p-2 border border-slate-300">(Empleados_Terminados / Empleados_Promedio) * 100</td>
-                                        <td class="p-2 border border-slate-300">Data Warehouse RRHH</td>
-                                        <td class="p-2 border border-slate-300">HR_REP_003</td>
-                                        <td class="p-2 border border-slate-300">TurnoverRate</td>
+                                        <td class="p-2 border border-slate-300">Costo Promedio por Adquisición</td>
+                                        <td class="p-2 border border-slate-300">Informe de Adquisición de Clientes</td>
+                                        <td class="p-2 border border-slate-300">CPA_USD</td>
+                                        <td class="p-2 border border-slate-300">Gasto_Publicidad, Nuevos_Clientes_Adquiridos</td>
+                                        <td class="p-2 border border-slate-300">50.00</td>
+                                        <td class="p-2 border border-slate-300">5000, 100</td>
+                                        <td class="p-2 border border-slate-300">Semanal</td>
+                                        <td class="p-2 border border-slate-300">Adquisición de Clientes</td>
+                                        <td class="p-2 border border-slate-300">Carlos Ruiz</td>
+                                        <td class="p-2 border border-slate-300">carlos.ruiz@ejemplo.com</td>
+                                        <td class="p-2 border border-slate-300">Plataformas de Anuncios, CRM</td>
+                                        <td class="p-2 border border-slate-300">SQL Stored Proc</td>
+                                        <td class="p-2 border border-slate-300">Gasto_Publicidad / Nuevos_Clientes_Adquiridos</td>
+                                        <td class="p-2 border border-slate-300">/data/advertising/costs/</td>
+                                        <td class="p-2 border border-slate-300">DB_Ad_Platform</td>
+                                        <td class="p-2 border border-slate-300">Fact_Adquisiciones</td>
+                                        <td class="p-2 border border-slate-300">CostPerAcquisition</td>
                                     </tr>
                                 </tbody>
                             </table>
