@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía Interactiva de Relevamiento de información</title>
+    <title>Guía Interactiva de Relevo de información</title>
     <!-- Carga de Tailwind CSS para un estilo rápido y responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Carga de Chart.js para gráficos interactivos -->
@@ -402,6 +402,7 @@
                                         <th class="p-2 border border-slate-300">NOMBRE DE INDICADOR</th>
                                         <th class="p-2 border border-slate-300">NOMBRE DEL REPORTE</th>
                                         <th class="p-2 border border-slate-300">CAMPO</th>
+                                        <th class="p-2 border border-slate-300">TIPO DE DATO</th> <!-- Nueva columna -->
                                         <th class="p-2 border border-slate-300">DATOS MUESTRA</th>
                                         <th class="p-2 border border-slate-300">TAMAÑO MUESTRA</th>
                                         <th class="p-2 border border-slate-300">PERIODICIDAD</th>
@@ -429,6 +430,11 @@
                                             <p class="font-semibold text-slate-700">Campo:</p>
                                             <p class="text-slate-600 text-xs">Especifique el nombre del campo o columna dentro del reporte que contiene el valor del indicador.</p>
                                             <p class="italic text-slate-500 text-xs mt-1">¿Cómo se llama la columna que muestra este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Tipo de Dato:</p> <!-- Instrucción para nueva columna -->
+                                            <p class="text-slate-600 text-xs">Clasifique el tipo de dato del campo (ej. Numérico, Texto, Fecha, Booleano).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué formato tiene este dato?</p>
                                         </td>
                                         <td class="p-2 border border-slate-300 align-top">
                                             <p class="font-semibold text-slate-700">Datos Muestra:</p>
@@ -476,6 +482,7 @@
                                         <td class="p-2 border border-slate-300">Ventas Totales Mensuales</td>
                                         <td class="p-2 border border-slate-300">Informe de Rendimiento Comercial</td>
                                         <td class="p-2 border border-slate-300">Monto_Ventas_Netas</td>
+                                        <td class="p-2 border border-slate-300">DECIMAL</td> <!-- Ejemplo para nueva columna -->
                                         <td class="p-2 border border-slate-300">150,000.00</td>
                                         <td class="p-2 border border-slate-300">10,000 registros</td>
                                         <td class="p-2 border border-slate-300">Mensual</td>
@@ -489,6 +496,7 @@
                                         <td class="p-2 border border-slate-300">Satisfacción del Cliente (NPS)</td>
                                         <td class="p-2 border border-slate-300">Dashboard de Experiencia Cliente</td>
                                         <td class="p-2 border border-slate-300">NPS_Score</td>
+                                        <td class="p-2 border border-slate-300">DECIMAL</td> <!-- Ejemplo para nueva columna -->
                                         <td class="p-2 border border-slate-300">7.5</td>
                                         <td class="p-2 border border-slate-300">500 encuestas</td>
                                         <td class="p-2 border border-slate-300">Semanal</td>
@@ -502,6 +510,7 @@
                                         <td class="p-2 border border-slate-300">Costos Operativos</td>
                                         <td class="p-2 border border-slate-300">Reporte Financiero Detallado</td>
                                         <td class="p-2 border border-slate-300">Total_Costos_Prod</td>
+                                        <td class="p-2 border border-slate-300">DECIMAL</td> <!-- Ejemplo para nueva columna -->
                                         <td class="p-2 border border-slate-300">80,000.00</td>
                                         <td class="p-2 border border-slate-300">2,000 transacciones</td>
                                         <td class="p-2 border border-slate-300">Mensual</td>
