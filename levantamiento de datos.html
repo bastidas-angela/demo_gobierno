@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Linaje de Datos</title>
+    <!-- Carga de Tailwind CSS para un estilo rápido y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de Chart.js para gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Carga de la fuente Inter de Google Fonts para una tipografía moderna -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos base para la fuente */
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        /* Contenedor de gráficos responsivo */
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 50vh; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        /* Estilo para el elemento de navegación activo */
+        .nav-item.active { background-color: #059669; /* emerald-600 */ color: white; }
+        .nav-item.active .nav-icon { filter: brightness(0) invert(1); } /* Invierte el color del icono cuando está activo */
+        /* Oculta las secciones de contenido por defecto */
+        .content-section { display: none; }
+        /* Muestra la sección de contenido activa */
+        .content-section.active { display: block; }
+        /* Estilo para el botón de pestaña activo */
+        .tab-button.active { border-color: #059669; /* emerald-600 */ color: #059669; /* emerald-600 */ background-color: #ecfdf5; /* emerald-50 */ }
+        /* Oculta el contenido de las pestañas por defecto */
+        .tab-content { display: none; }
+        /* Muestra el contenido de la pestaña activa */
+        .tab-content.active { display: block; }
+        /* Estilo para el círculo y título del paso activo en la metodología */
+        .step.active .step-circle { background-color: #059669; /* emerald-600 */ color: white; }
+        .step.active .step-title { color: #059669; /* emerald-600 */ }
+        /* Oculta el contenido del paso por defecto */
+        .step-content { display: none; }
+        /* Muestra el contenido del paso activo */
+        .step-content.active { display: block; }
+        /* Estilo para la tarjeta de concepto activa */
+        .concept-card.active { border-color: #059669; /* emerald-600 */ box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.2); /* emerald-600 with transparency */ }
+        /* Estilo para la etapa del ciclo de vida activa (todos los puntos a resaltar en verde) */
+        .lifecycle-stage.active { background-color: #ecfdf5; /* emerald-50 */ border-left-color: #059669; /* emerald-600 */ }
+        
+        /* Estilo para el logo */
+        .logo-container {
+            padding: 0.5rem; /* Ajuste de padding para el logo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            /* Eliminado: background-color: white; */ /* Ya no se necesita fondo blanco */
+            border-radius: 0.5rem; /* Bordes redondeados para el contenedor del logo */
+        }
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Estilos para los recuadros grandes del diagrama */
+        .concept-node-large {
+            padding: 1rem 2rem; /* Ajustado para ser más grande */
+            min-width: 180px; /* Ancho mínimo para los recuadros */
+            min-height: 60px; /* Altura mínima para los recuadros */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        /* Estilos para las flechas */
+        .arrowhead-down {
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #94a3b8; /* slate-400 */
+            position: absolute;
+            z-index: 10;
+        }
+
+        .arrowhead-up {
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid #94a3b8; /* slate-400 */
+            position: absolute;
+            z-index: 10;
+        }
+
+        /* Estilos para las nuevas tarjetas de tipos de datos */
+        .data-type-card {
+            background-color: #f8fafc; /* slate-50 */
+            border: 2px solid #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative; /* Needed for absolute positioning of details */
+            overflow: hidden; /* Hide overflowing content when not active */
+        }
+
+        .data-type-card.active {
+            border-color: #059669; /* emerald-600 */
+            box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.2);
+            background-color: #ecfdf5; /* emerald-50 */
+        }
+
+        .data-type-card .details {
+            max-height: 0;
+            transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+            overflow: hidden;
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        .data-type-card.active .details {
+            max-height: 200px; /* Adjust as needed to fit content */
+            opacity: 1;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div class="flex min-h-screen">
+        <!-- Barra lateral de navegación para pantallas grandes (desktop) -->
+        <aside class="w-64 bg-slate-900 text-white p-4 flex-col fixed h-full hidden lg:flex">
+            <!-- Contenedor del logo -->
+            <div class="logo-container">
+                <img src="Logo handytec Business IT-04.png" alt="Logo handytec Business IT">
+            </div>
+            <h1 class="text-2xl font-bold text-emerald-400 mb-8">Gobierno de Datos</h1>
+            <nav id="desktop-nav" class="flex flex-col space-y-2">
+                <a href="#inicio" class="nav-item flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                    Visión General
+                </a>
+                <a href="#conceptos" class="nav-item flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                    Conceptos Clave
+                </a>
+                <a href="#ciclo-de-vida" class="nav-item flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                    Ciclo de Vida del Dato
+                </a>
+                <a href="#metodologia" class="nav-item flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                    Metodología de Mapeo
+                </a>
+                <a href="#herramientas" class="nav-item flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                    Herramientas y Plantillas
+                </a>
+                <a href="#gobernanza" class="nav-item flex items-center p-3 rounded-lg hover:bg-slate-700 transition-colors duration-200">
+                    Gobernanza y Roles
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Barra de navegación inferior para pantallas pequeñas (móvil) -->
+        <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-slate-900 z-50">
+             <nav id="mobile-nav" class="flex justify-around p-2">
+                <a href="#inicio" class="nav-item p-2 rounded-md">🏠</a>
+                <a href="#conceptos" class="nav-item p-2 rounded-md">🔑</a>
+                <a href="#ciclo-de-vida" class="nav-item p-2 rounded-md">🔄</a>
+                <a href="#metodologia" class="nav-item p-2 rounded-md">🗺️</a>
+                <a href="#herramientas" class="nav-item p-2 rounded-md">🛠️</a>
+                <a href="#gobernanza" class="nav-item p-2 rounded-md">🏛️</a>
+            </nav>
+        </div>
+
+        <!-- Contenido principal de la guía -->
+        <main class="flex-1 lg:ml-64 p-6 md:p-8 lg:p-12 mb-16 lg:mb-0">
+            
+            <!-- Sección: Visión General -->
+            <section id="inicio" class="content-section">
+                <h2 class="text-4xl font-bold text-emerald-600 mb-4">Dominando la Trazabilidad y el Linaje de Datos</h2>
+                <p class="text-lg text-slate-600 mb-8">Esta guía interactiva tiene como objetivo transformar el complejo mundo del linaje de datos en un viaje claro y manejable para su organización. Le permitirá explorar los conceptos fundamentales, entender el ciclo de vida completo de sus datos y aplicar una metodología probada para mapear el flujo de información, desde el informe final hasta la fuente original, garantizando la confianza y la calidad de sus activos de datos.</p>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-2xl font-semibold mb-4 text-slate-700">El Ecosistema del Linaje de Datos</h3>
+                    <p class="text-slate-600 mb-6">El linaje no existe en el vacío. Se interconecta con otros conceptos cruciales para una gobernanza de datos robusta. Pase el cursor sobre cada elemento para ver sus relaciones y cómo contribuyen a una visión completa de los datos.</p>
+                    <div class="relative flex flex-col items-center justify-center p-8" style="min-height: 500px; width: 100%; max-width: 900px; margin: 0 auto;">
+                        <!-- Top Node: Ciclo de Vida del Dato -->
+                        <div class="concept-node-large bg-emerald-100 border-2 border-emerald-500 rounded-lg shadow-lg" data-concept="ciclo-de-vida" style="position: absolute; top: 30px; left: 50%; transform: translateX(-50%);">
+                            <h4 class="font-bold text-emerald-800">Ciclo de Vida del Dato</h4>
+                        </div>
+
+                        <!-- Bottom Row Nodes -->
+                        <div class="concept-node-large bg-slate-100 border-2 border-slate-500 rounded-lg shadow-lg" data-concept="trazabilidad" style="position: absolute; bottom: 100px; left: 50px;">
+                            <h4 class="font-bold text-slate-800">Trazabilidad</h4>
+                        </div>
+                        <div class="concept-node-large bg-slate-100 border-2 border-slate-500 rounded-lg shadow-lg" data-concept="linaje" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);">
+                            <h4 class="font-bold text-slate-800">Linaje</h4>
+                        </div>
+                        <div class="concept-node-large bg-slate-100 border-2 border-slate-500 rounded-lg shadow-lg" data-concept="procedencia" style="position: absolute; bottom: 100px; right: 50px;">
+                            <h4 class="font-bold text-slate-800">Procedencia</h4>
+                        </div>
+
+                        <!-- Lines and Arrows -->
+                        <!-- Line from Ciclo de Vida (center) to horizontal line (center) -->
+                        <div class="absolute bg-slate-300" style="width: 2px; height: 190px; top: 95px; left: 50%; transform: translateX(-50%); z-index: 5;"></div>
+                        <div class="arrowhead-down" style="top: 285px; left: 50%; transform: translateX(-50%); z-index: 10;"></div>
+
+                        <!-- Horizontal line connecting bottom nodes -->
+                        <div class="absolute bg-slate-300" style="height: 2px; width: 700px; top: 285px; left: 100px; z-index: 5;"></div>
+
+                        <!-- Vertical lines from horizontal to bottom nodes -->
+                        <!-- Trazabilidad vertical line -->
+                        <div class="absolute bg-slate-300" style="width: 2px; height: 30px; top: 285px; left: 190px; z-index: 5;"></div>
+                        <div class="arrowhead-up" style="top: 310px; left: 190px; transform: translateX(-50%); z-index: 10;"></div>
+
+                        <!-- Linaje vertical line -->
+                        <div class="absolute bg-slate-300" style="width: 2px; height: 30px; top: 285px; left: 50%; transform: translateX(-50%); z-index: 5;"></div>
+                        <div class="arrowhead-up" style="top: 310px; left: 50%; transform: translateX(-50%); z-index: 10;"></div>
+
+                        <!-- Procedencia vertical line -->
+                        <div class="absolute bg-slate-300" style="width: 2px; height: 30px; top: 285px; left: 710px; z-index: 5;"></div>
+                        <div class="arrowhead-up" style="top: 310px; left: 710px; transform: translateX(-50%); z-index: 10;"></div>
+
+                        <p id="concept-explanation" class="mt-8 text-center text-slate-600 h-10 transition-all duration-300" style="position: absolute; bottom: 20px; width: 100%;"></p>
+                    </div>
+                    <p class="text-slate-600 mt-8">
+                        En este ecosistema, el **CICLO DE VIDA DEL DATO** actúa como el marco temporal y procesal que abarca todas las fases por las que atraviesa la información. Dentro de este ciclo, el **LINAJE DE DATOS** es la documentación explícita y detallada de cada paso que un dato toma, incluyendo su origen, transformaciones y destinos. La **TRAZABILIDAD** es la capacidad práctica de seguir y verificar este linaje en cualquier momento. Finalmente, la **PROCEDENCIA** se enfoca en el origen específico y el historial de modificaciones de un dato particular, proporcionando un nivel de auditoría y confianza esencial para la calidad de la información.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Sección: Conceptos Clave -->
+            <section id="conceptos" class="content-section">
+                <h2 class="text-4xl font-bold text-emerald-600 mb-2">Conceptos Clave</h2>
+                <p class="text-lg text-slate-600 mb-8">Para una comprensión sólida del linaje de datos, es fundamental dominar estos conceptos interrelacionados. Haga clic en cada tarjeta para explorar los pilares de la gobernanza de datos y cómo se diferencian.</p>
+                
+                <!-- Nueva sección de diferenciación de tipos de datos -->
+                <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+                    <h3 class="text-2xl font-semibold text-slate-700 mb-4">Diferenciando Tipos de Datos Clave en el Flujo</h3>
+                    <p class="text-slate-600 mb-6">Comprender la naturaleza de los diferentes tipos de datos es esencial para un mapeo de linaje preciso. Cada uno juega un rol distinto en el viaje de la información. Haga clic en cada tarjeta para ver una descripción detallada.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                        <div id="data-type-maestro" class="data-type-card" data-type="maestro">
+                            <span class="text-4xl mb-2 block">👑</span>
+                            <h4 class="font-bold text-lg text-slate-800">Dato Maestro</h4>
+                            <p class="text-slate-600 text-sm">Datos fundamentales y no transaccionales sobre entidades de negocio clave (clientes, productos, proveedores). Son estables y consistentes.</p>
+                            <div class="details">
+                                <p class="font-semibold text-slate-700 mt-4 pt-4 border-t border-slate-200">Detalle:</p>
+                                <p class="text-slate-600 text-sm">Los datos maestros son la base de la información de una organización. Son críticos porque su exactitud y consistencia impactan en múltiples sistemas y procesos. Su gestión adecuada es vital para la integridad de los datos.</p>
+                                <p class="italic text-slate-500 text-xs mt-1">Ej: ID de Cliente, Nombre de Producto, Código de Proveedor, Dirección de Sucursal.</p>
+                            </div>
+                        </div>
+                        <div id="data-type-intermedia" class="data-type-card" data-type="intermedia">
+                            <span class="text-4xl mb-2 block">⚙️</span>
+                            <h4 class="font-bold text-lg text-slate-800">Variable Intermedia</h4>
+                            <p class="text-slate-600 text-sm">Resultado de una transformación o cálculo que no es un dato final, pero es crucial para llegar a un indicador o informe.</p>
+                            <div class="details">
+                                <p class="font-semibold text-slate-700 mt-4 pt-4 border-t border-slate-200">Detalle:</p>
+                                <p class="text-slate-600 text-sm">Las variables intermedias son pasos en el procesamiento de datos. No se consumen directamente como información final, pero son componentes esenciales en la cadena de valor del dato, permitiendo la construcción de métricas más complejas.</p>
+                                <p class="italic text-slate-500 text-xs mt-1">Ej: Subtotal antes de impuestos, Cantidad convertida a unidad estándar, Duración de llamada en segundos.</p>
+                            </div>
+                        </div>
+                        <div id="data-type-indicador" class="data-type-card" data-type="indicador">
+                            <span class="text-4xl mb-2 block">📈</span>
+                            <h4 class="font-bold text-lg text-slate-800">Indicador</h4>
+                            <p class="text-slate-600 text-sm">Una métrica o KPI que mide el rendimiento o el estado de un aspecto del negocio. Es un dato final para el análisis.</p>
+                            <div class="details">
+                                <p class="font-semibold text-slate-700 mt-4 pt-4 border-t border-slate-200">Detalle:</p>
+                                <p class="text-slate-600 text-sm">Los indicadores son el resultado de procesar datos para obtener información accionable. Son vitales para la toma de decisiones estratégicas y operativas, ya que resumen el estado y el rendimiento de áreas clave del negocio.</p>
+                                <p class="italic text-slate-500 text-xs mt-1">Ej: Ventas Mensuales, NPS (Net Promoter Score), Margen de Beneficio, Tasa de Conversión.</p>
+                            </div>
+                        </div>
+                        <div id="data-type-informe" class="data-type-card" data-type="informe">
+                            <span class="text-4xl mb-2 block">📄</span>
+                            <h4 class="font-bold text-lg text-slate-800">Informe</h4>
+                            <p class="text-slate-600 text-sm">Documento o dashboard que presenta datos e indicadores de manera estructurada para la toma de decisiones.</p>
+                            <div class="details">
+                                <p class="font-semibold text-slate-700 mt-4 pt-4 border-t border-slate-200">Detalle:</p>
+                                <p class="text-slate-600 text-sm">Los informes son la presentación final de los datos transformados en información. Agrupan indicadores y datos relevantes para proporcionar una visión consolidada, facilitando la comprensión y el análisis por parte de los usuarios de negocio.</p>
+                                <p class="italic text-slate-500 text-xs mt-1">Ej: Informe de Ventas Trimestrales, Dashboard Financiero, Reporte de Clientes Potenciales, Presentación de Resultados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Tarjeta de Trazabilidad -->
+                    <div id="card-trazabilidad" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h3 class="text-2xl font-semibold text-slate-700 mb-3">Trazabilidad de Datos</h3>
+                        <p class="text-slate-600">La capacidad de seguir el rastro de los datos a través de todo su recorrido, desde su origen hasta su destino final, incluyendo todos los puntos intermedios.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold">Pregunta Clave:</p>
+                            <p class="italic text-slate-500 mb-2">"¿Podemos seguir el camino completo de estos datos? ¿Dónde han estado en cada etapa?"</p>
+                            <p class="font-semibold">Foco Principal:</p>
+                            <p class="text-slate-500">La *capacidad* de rastrear el movimiento y la ubicación de los datos a lo largo del tiempo.</p>
+                        </div>
+                    </div>
+                    <!-- Tarjeta de Linaje -->
+                    <div id="card-linaje" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h3 class="text-2xl font-semibold text-slate-700 mb-3">Linaje de Datos</h3>
+                        <p class="text-slate-600">El registro documentado y detallado del flujo de datos. Describe el origen de los datos, cómo se mueven, las transformaciones que sufren y dónde se utilizan, proporcionando un historial completo.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold">Pregunta Clave:</p>
+                            <p class="italic text-slate-500 mb-2">"¿Cuál es el camino específico y las transformaciones exactas que siguieron estos datos para llegar a su estado actual?"</p>
+                             <p class="font-semibold">Foco Principal:</p>
+                            <p class="text-slate-500">El *registro explícito* del viaje de los datos, incluyendo cada cambio y su impacto.</p>
+                        </div>
+                    </div>
+                    <!-- Tarjeta de Procedencia -->
+                    <div id="card-procedencia" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h3 class="text-2xl font-semibold text-slate-700 mb-3">Procedencia de Datos</h3>
+                        <p class="text-slate-600">Se refiere al origen exacto de un dato o un conjunto de datos. Responde a la pregunta de "dónde vino esto" y puede incluir información sobre quién lo creó y cuándo.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold">Pregunta Clave:</p>
+                            <p class="italic text-slate-500 mb-2">"¿De dónde vino exactamente este dato, quién lo generó o modificó por última vez, y cuándo?"</p>
+                             <p class="font-semibold">Foco Principal:</p>
+                            <p class="text-slate-500">El *origen y la historia auditada* de un dato o un conjunto de datos en un punto específico del tiempo.</p>
+                        </div>
+                    </div>
+                    <!-- Tarjeta de Ciclo de Vida -->
+                    <div id="card-ciclo" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h3 class="2xl font-semibold text-emerald-600 mb-3">Ciclo de Vida de los Datos (DLM)</h3>
+                        <p class="text-slate-600">La secuencia de etapas por las que pasan los datos desde su concepción inicial (creación o captura) hasta su eventual eliminación o archivo.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold">Pregunta Clave:</p>
+                            <p class="italic text-slate-500 mb-2">"¿En qué fase de su 'vida' se encuentran los datos y qué acciones son apropiadas en cada una?"</p>
+                             <p class="font-semibold">Foco Principal:</p>
+                            <p class="text-slate-500">La *gestión integral* de los datos a lo largo de su existencia, asegurando su valor y cumplimiento normativo.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección: Ciclo de Vida Interactivo del Dato -->
+            <section id="ciclo-de-vida" class="content-section">
+                <h2 class="text-4xl font-bold text-emerald-600 mb-2">Ciclo de Vida Interactivo del Dato</h2>
+                <p class="text-lg text-slate-600 mb-8">Cada dato emprende un viaje desde su génesis hasta su disposición final. Comprender cada etapa es crucial para un linaje efectivo. Seleccione una etapa para conocer sus imperativos de mapeo de linaje, las preguntas clave que debe hacerse y los metadatos críticos que debe capturar.</p>
+                <div class="lg:flex lg:space-x-8">
+                    <div class="lg:w-1/3 mb-8 lg:mb-0">
+                        <div id="lifecycle-stages" class="space-y-2">
+                            <!-- Las etapas se generarán aquí mediante JavaScript -->
+                        </div>
+                    </div>
+                    <div class="lg:w-2/3 bg-white p-6 rounded-xl shadow-md">
+                        <div id="lifecycle-details">
+                            <h3 id="lifecycle-title" class="text-2xl font-semibold text-emerald-700 mb-4">Seleccione una etapa</h3>
+                            <p id="lifecycle-desc" class="text-slate-600 mb-4">Haga clic en una de las etapas a la izquierda para ver los detalles, las preguntas clave de linaje y los metadatos críticos que se deben capturar. Cada etapa tiene un color asignado para facilitar su identificación visual en el ciclo de vida.</p>
+                            <div id="lifecycle-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección: Metodología de Mapeo Guíada -->
+            <section id="metodologia" class="content-section">
+                <h2 class="text-4xl font-bold text-emerald-600 mb-2">Metodología de Mapeo Guíada</h2>
+                <p class="text-lg text-slate-600 mb-8">Para establecer un linaje de datos robusto y confiable, es esencial seguir un marco de trabajo estructurado. Este proceso guiado le permitirá mapear la trazabilidad desde los informes de negocio hasta las fuentes de datos originales, pasando por todas las transformaciones. Avance por cada fase para entender las actividades clave y las consideraciones importantes.</p>
+                <div class="flex flex-col md:flex-row -mx-4">
+                    <div id="methodology-steps" class="md:w-1/3 px-4 space-y-4 mb-8 md:mb-0">
+                        <!-- Los pasos se generarán aquí mediante JavaScript -->
+                    </div>
+                    <div class="md:w-2/3 px-4">
+                        <div id="methodology-contents" class="bg-white p-6 rounded-xl shadow-md min-h-[300px]">
+                            <!-- El contenido de los pasos se mostrará aquí -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sección: Herramientas y Plantillas -->
+            <section id="herramientas" class="content-section">
+                <h2 class="text-4xl font-bold text-emerald-600 mb-8">Herramientas y Plantillas</h2>
+                <p class="text-lg text-slate-600 mb-8">La implementación del linaje de datos se beneficia enormemente de las herramientas adecuadas y de plantillas estandarizadas. Aquí exploramos los diferentes enfoques de mapeo y le proporcionamos las plantillas clave para documentar el linaje en su organización.</p>
+                <div class="mb-8">
+                    <div id="tools-tabs" class="flex border-b border-slate-200">
+                        <button data-tab="approaches" class="tab-button py-2 px-4 font-semibold border-b-2 border-transparent transition-colors duration-300">Enfoques de Linaje</button>
+                        <button data-tab="templates" class="tab-button py-2 px-4 font-semibold border-b-2 border-transparent transition-colors duration-300">Plantillas de Documentación</button>
+                    </div>
+                </div>
+                
+                <!-- Contenido de la pestaña: Enfoques de Linaje -->
+                <div id="tab-approaches" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-slate-700 mb-2">Comparación de Enfoques de Mapeo de Linaje</h3>
+                    <p class="text-slate-600 mb-6">No todos los enfoques para establecer el linaje de datos son iguales. Este gráfico compara las metodologías manual, semiautomatizada y totalmente automatizada en función de métricas clave como el esfuerzo requerido, la precisión y la escalabilidad, ayudándole a elegir la estrategia más adecuada para su contexto.</p>
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                      <div class="chart-container">
+                          <canvas id="approachesChart"></canvas>
+                      </div>
+                    </div>
+                </div>
+                
+                <!-- Contenido de la pestaña: Plantillas -->
+                <div id="tab-templates" class="tab-content">
+                    <h3 class="2xl font-semibold text-slate-700 mb-2">Plantillas de Documentación de Linaje</h3>
+                    <p class="text-slate-600 mb-6">Estas plantillas estructuradas son un punto de partida invaluable para documentar el linaje de sus datos. Aunque se presentan aquí como tablas HTML para su visualización, están diseñadas para ser implementadas y gestionadas en una hoja de cálculo (como Excel) o una herramienta de catálogo de datos. Incluyen ejemplos para guiarle en su llenado.</p>
+                    
+                    <!-- Plantilla 1: Flujo de Datos e Informes -->
+                    <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+                        <h4 class="text-xl font-semibold mb-2 text-slate-700">Plantilla 1: Flujo de Datos e Informes</h4>
+                        <p class="text-slate-500 mb-4">Esta tabla le permite visualizar los indicadores y reportes clave de su negocio, rastreando su origen, las herramientas utilizadas y las fuentes de datos primarias. Es ideal para una visión de alto nivel de los activos de información.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 border border-slate-300">NOMBRE DE INDICADOR</th>
+                                        <th class="p-2 border border-slate-300">NOMBRE DEL REPORTE</th>
+                                        <th class="p-2 border border-slate-300">CAMPO</th>
+                                        <th class="p-2 border border-slate-300">DATOS MUESTRA</th>
+                                        <th class="p-2 border border-slate-300">TAMAÑO MUESTRA</th>
+                                        <th class="p-2 border border-slate-300">PERIODICIDAD</th>
+                                        <th class="p-2 border border-slate-300">RESPONSABLE</th>
+                                        <th class="p-2 border border-slate-300">NOMBRE CRUCE</th>
+                                        <th class="p-2 border border-slate-300">ORIGEN DE DATOS</th>
+                                        <th class="p-2 border border-slate-300">HERRAMIENTA</th>
+                                        <th class="p-2 border border-slate-300">FUENTE DE DATOS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Instrucciones y ejemplos para Plantilla 1 -->
+                                    <tr>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Nombre de Indicador:</p>
+                                            <p class="text-slate-600 text-xs">Identifique el nombre del Indicador Clave de Rendimiento (KPI) o la métrica principal que se reporta.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué métrica o KPI estamos analizando?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Nombre del Reporte:</p>
+                                            <p class="text-slate-600 text-xs">Indique el nombre del informe o dashboard donde se visualiza este indicador.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿En qué informe o dashboard aparece este indicador?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Campo:</p>
+                                            <p class="text-slate-600 text-xs">Especifique el nombre del campo o columna dentro del reporte que contiene el valor del indicador.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se llama la columna que muestra este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Datos Muestra:</p>
+                                            <p class="text-slate-600 text-xs">Proporcione un ejemplo de valor para el campo (opcional, para referencia rápida).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué valor típico podríamos ver aquí?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Tamaño Muestra:</p>
+                                            <p class="text-slate-600 text-xs">Indique el volumen o la cantidad de datos asociados a la muestra (opcional).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuántos registros o qué volumen de datos representa?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Periodicidad:</p>
+                                            <p class="text-slate-600 text-xs">Describa con qué frecuencia se actualiza o genera el reporte/indicador (ej. diario, semanal, mensual).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Con qué frecuencia se actualiza este dato o informe?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Responsable:</p>
+                                            <p class="text-slate-600 text-xs">Identifique al individuo o equipo de negocio responsable de la definición y/o uso de este indicador.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Quién es el dueño de negocio de este indicador?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Nombre Cruce:</p>
+                                            <p class="text-slate-600 text-xs">Cualquier denominación alternativa o relacionada del dato en otros sistemas o contextos.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Se conoce este dato con otro nombre en otros sistemas?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Origen de Datos:</p>
+                                            <p class="text-slate-600 text-xs">Nombre de los sistemas o aplicaciones de donde provienen los datos iniciales para este indicador.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿De dónde provienen los datos que alimentan este indicador?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Herramienta:</p>
+                                            <p class="text-slate-600 text-xs">Software o plataforma utilizada para procesar, transformar o visualizar el dato (ej. Power BI, Tableau, ETL Tool).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué herramienta se usa para procesar o mostrar este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">Fuente de Datos:</p>
+                                            <p class="text-slate-600 text-xs">La base de datos, archivo específico, API o sistema que alimenta directamente la herramienta mencionada.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es la base de datos o archivo exacto que alimenta la herramienta?</p>
+                                        </td>
+                                    </tr>
+                                    <!-- Ejemplos inventados para Plantilla 1 -->
+                                    <tr class="border-b border-slate-200 bg-slate-50">
+                                        <td class="p-2 border border-slate-300">Ventas Totales Mensuales</td>
+                                        <td class="p-2 border border-slate-300">Informe de Rendimiento Comercial</td>
+                                        <td class="p-2 border border-slate-300">Monto_Ventas_Netas</td>
+                                        <td class="p-2 border border-slate-300">150,000.00</td>
+                                        <td class="p-2 border border-slate-300">10,000 registros</td>
+                                        <td class="p-2 border border-slate-300">Mensual</td>
+                                        <td class="p-2 border border-slate-300">Gerencia de Ventas</td>
+                                        <td class="p-2 border border-slate-300">Sales_Revenue</td>
+                                        <td class="p-2 border border-slate-300">Sistema CRM, Sistema POS</td>
+                                        <td class="p-2 border border-slate-300">Power BI</td>
+                                        <td class="p-2 border border-slate-300">DW_Ventas.Fact_Ventas</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-200">
+                                        <td class="p-2 border border-slate-300">Satisfacción del Cliente (NPS)</td>
+                                        <td class="p-2 border border-slate-300">Dashboard de Experiencia Cliente</td>
+                                        <td class="p-2 border border-slate-300">NPS_Score</td>
+                                        <td class="p-2 border border-slate-300">7.5</td>
+                                        <td class="p-2 border border-slate-300">500 encuestas</td>
+                                        <td class="p-2 border border-slate-300">Semanal</td>
+                                        <td class="p-2 border border-slate-300">Atención al Cliente</td>
+                                        <td class="p-2 border border-slate-300">Customer_Sentiment</td>
+                                        <td class="p-2 border border-slate-300">Sistema de Encuestas, CRM</td>
+                                        <td class="p-2 border border-slate-300">Tableau</td>
+                                        <td class="p-2 border border-slate-300">DB_Encuestas.Respuestas, DW_Clientes.Dim_Cliente</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-200 bg-slate-50">
+                                        <td class="p-2 border border-slate-300">Costos Operativos</td>
+                                        <td class="p-2 border border-slate-300">Reporte Financiero Detallado</td>
+                                        <td class="p-2 border border-slate-300">Total_Costos_Prod</td>
+                                        <td class="p-2 border border-slate-300">80,000.00</td>
+                                        <td class="p-2 border border-slate-300">2,000 transacciones</td>
+                                        <td class="p-2 border border-slate-300">Mensual</td>
+                                        <td class="p-2 border border-slate-300">Control Financiero</td>
+                                        <td class="p-2 border border-slate-300">OpEx</td>
+                                        <td class="p-2 border border-slate-300">ERP Contabilidad, Sistema de Inventario</td>
+                                        <td class="p-2 border border-slate-300">Scripts Python (ETL)</td>
+                                        <td class="p-2 border border-slate-300">ERP_DB.Costos, INV_DB.Movimientos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Plantilla 2: Detalle del Linaje y Transformaciones -->
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h4 class="text-xl font-semibold mb-2 text-slate-700">Plantilla 2: Detalle del Linaje y Transformaciones</h4>
+                        <p class="text-slate-500 mb-4">Esta plantilla ofrece una vista más granular del linaje, detallando el origen de un dato específico, las transformaciones que sufre en cada "salto" y los destinos de su explotación. Es fundamental para comprender la calidad y la lógica detrás de sus datos.</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 border border-slate-300">CAMPO</th>
+                                        <th class="p-2 border border-slate-300">NOMBRE DEL DATO</th>
+                                        <th class="p-2 border border-slate-300">TIPO DE DATO</th>
+                                        <th class="p-2 border border-slate-300">MÉTODO DE OBTENCIÓN</th>
+                                        <th class="p-2 border border-slate-300">ÁREA RESPONSABLE</th>
+                                        <th class="p-2 border border-slate-300">RESPONSABLE DE ACTIVACIÓN</th>
+                                        <th class="p-2 border border-slate-300">NOMBRE DE ORIGEN</th>
+                                        <th class="p-2 border border-slate-300">ORIGEN</th>
+                                        <th class="p-2 border border-slate-300">UBICACIÓN ACTUAL</th>
+                                        <th class="p-2 border border-slate-300">TRANSFORMACIÓN 1</th>
+                                        <th class="p-2 border border-slate-300">TRANSFORMACIÓN 2</th>
+                                        <th class="p-2 border border-slate-300">TRANSFORMACIÓN 3</th>
+                                        <th class="p-2 border border-slate-300">TRANSFORMACIÓN 4</th>
+                                        <th class="p-2 border border-slate-300">UBICACIÓN FUTURA</th>
+                                        <th class="p-2 border border-slate-300">DESTINO 1</th>
+                                        <th class="p-2 border border-slate-300">DESTINO 2</th>
+                                        <th class="p-2 border border-slate-300">DESTINO 3</th>
+                                        <th class="p-2 border border-slate-300">EXPLOTACIÓN 1</th>
+                                        <th class="p-2 border border-slate-300">EXPLOTACIÓN 2</th>
+                                        <th class="p-2 border border-slate-300">EXPLOTACIÓN 3</th>
+                                        <th class="p-2 border border-slate-300">EXPLOTACIÓN 4</th>
+                                        <th class="p-2 border border-slate-300">INFORME 1</th>
+                                        <th class="p-2 border border-slate-300">INFORME 2</th>
+                                        <th class="p-2 border border-slate-300">INFORME 3</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Instrucciones y ejemplos para Plantilla 2 -->
+                                    <tr>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">CAMPO:</p>
+                                            <p class="text-slate-600 text-xs">El nombre técnico del campo o columna de datos.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se llama la columna en la base de datos?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">NOMBRE DEL DATO:</p>
+                                            <p class="text-slate-600 text-xs">Una descripción comprensible del dato para el negocio.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué significa este dato para el negocio?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">TIPO DE DATO:</p>
+                                            <p class="text-slate-600 text-xs">El tipo de dato (ej. INTEGER, VARCHAR, DECIMAL, DATETIME).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Es texto, número, fecha?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">MÉTODO DE OBTENCIÓN:</p>
+                                            <p class="text-slate-600 text-xs">Cómo se captura o genera este dato inicialmente (ej. Formulario Web, API, Carga Manual, Sensor).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo entra este dato a nuestros sistemas?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">ÁREA RESPONSABLE:</p>
+                                            <p class="text-slate-600 text-xs">El departamento o equipo de negocio que es el dueño funcional de este dato.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Quién es el responsable de la calidad y definición de este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">RESPONSABLE DE ACTIVACIÓN:</p>
+                                            <p class="text-slate-600 text-xs">Persona o equipo que inicia o gestiona la captura o actualización de este dato.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Quién es el punto de contacto para la entrada de este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">NOMBRE DE ORIGEN:</p>
+                                            <p class="text-slate-600 text-xs">El nombre del sistema o aplicación fuente donde el dato se genera o reside por primera vez.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cuál es el sistema original de este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">ORIGEN:</p>
+                                            <p class="text-slate-600 text-xs">Identificador específico de la base de datos, tabla o archivo dentro del sistema de origen.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿En qué tabla o archivo del sistema original se encuentra?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">UBICACIÓN ACTUAL:</p>
+                                            <p class="text-slate-600 text-xs">Dónde se encuentra el dato en la etapa actual del flujo (ej. Staging Area, Data Lake, Data Warehouse).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Dónde está el dato ahora mismo en su flujo?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">TRANSFORMACIÓN 1:</p>
+                                            <p class="text-slate-600 text-xs">Describa la lógica de negocio o manipulación aplicada al dato en esta etapa. Sea específico (ej. "Cálculo de impuestos", "Normalización de texto", "Agregación por mes").</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué cambios se le hacen al dato aquí?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">TRANSFORMACIÓN 2:</p>
+                                            <p class="text-slate-600 text-xs">Describa la lógica de negocio o manipulación aplicada al dato en esta etapa. Sea específico (ej. "Cálculo de impuestos", "Normalización de texto", "Agregación por mes").</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué cambios se le hacen al dato aquí?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">TRANSFORMACIÓN 3:</p>
+                                            <p class="text-slate-600 text-xs">Describa la lógica de negocio o manipulación aplicada al dato en esta etapa. Sea específico (ej. "Cálculo de impuestos", "Normalización de texto", "Agregación por mes").</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué cambios se le hacen al dato aquí?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">TRANSFORMACIÓN 4:</p>
+                                            <p class="text-slate-600 text-xs">Describa la lógica de negocio o manipulación aplicada al dato en esta etapa. Sea específico (ej. "Cálculo de impuestos", "Normalización de texto", "Agregación por mes").</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué cambios se le hacen al dato aquí?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">UBICACIÓN FUTURA:</p>
+                                            <p class="text-slate-600 text-xs">El siguiente sistema o repositorio donde el dato reside después de las transformaciones.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿A dónde va el dato después de estas transformaciones?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">DESTINO 1:</p>
+                                            <p class="text-slate-600 text-xs">El sistema o aplicación final donde el dato es consumido o utilizado (ej. Data Mart, Herramienta BI, Aplicación de Negocio).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué sistema consume este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">DESTINO 2:</p>
+                                            <p class="text-slate-600 text-xs">El sistema o aplicación final donde el dato es consumido o utilizado (ej. Data Mart, Herramienta BI, Aplicación de Negocio).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué sistema consume este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">DESTINO 3:</p>
+                                            <p class="text-slate-600 text-xs">El sistema o aplicación final donde el dato es consumido o utilizado (ej. Data Mart, Herramienta BI, Aplicación de Negocio).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Qué sistema consume este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">EXPLOTACIÓN 1:</p>
+                                            <p class="text-slate-600 text-xs">Ejemplos específicos de cómo se utiliza el dato (ej. Dashboard de Ventas, Modelo de Predicción, API de Clientes).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se usa este dato en el negocio?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">EXPLOTACIÓN 2:</p>
+                                            <p class="text-slate-600 text-xs">Ejemplos específicos de cómo se utiliza el dato (ej. Dashboard de Ventas, Modelo de Predicción, API de Clientes).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se usa este dato en el negocio?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">EXPLOTACIÓN 3:</p>
+                                            <p class="text-slate-600 text-xs">Ejemplos específicos de cómo se utiliza el dato (ej. Dashboard de Ventas, Modelo de Predicción, API de Clientes).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se usa este dato en el negocio?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">EXPLOTACIÓN 4:</p>
+                                            <p class="text-slate-600 text-xs">Ejemplos específicos de cómo se utiliza el dato (ej. Dashboard de Ventas, Modelo de Predicción, API de Clientes).</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿Cómo se usa este dato en el negocio?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">INFORME 1:</p>
+                                            <p class="text-slate-600 text-xs">Nombres de informes específicos donde este dato transformado aparece.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿En qué informes finales se ve este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">INFORME 2:</p>
+                                            <p class="text-slate-600 text-xs">Nombres de informes específicos donde este dato transformado aparece.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿En qué informes finales se ve este dato?</p>
+                                        </td>
+                                        <td class="p-2 border border-slate-300 align-top">
+                                            <p class="font-semibold text-slate-700">INFORME 3:</p>
+                                            <p class="text-slate-600 text-xs">Nombres de informes específicos donde este dato transformado aparece.</p>
+                                            <p class="italic text-slate-500 text-xs mt-1">¿En qué informes finales se ve este dato?</p>
+                                        </td>
+                                    </tr>
+                                    <!-- Ejemplos inventados para Plantilla 2 -->
+                                    <tr class="border-b border-slate-200 bg-slate-50">
+                                        <td class="p-2 border border-slate-300">ID_Cliente</td>
+                                        <td class="p-2 border border-slate-300">Identificador Único de Cliente</td>
+                                        <td class="p-2 border border-slate-300">INTEGER</td>
+                                        <td class="p-2 border border-slate-300">Formulario Web</td>
+                                        <td class="p-2 border border-slate-300">Marketing</td>
+                                        <td class="p-2 border border-slate-300">Equipo de Registro</td>
+                                        <td class="p-2 border border-slate-300">Sistema Web</td>
+                                        <td class="p-2 border border-slate-300">DB_Web.Clientes</td>
+                                        <td class="p-2 border border-slate-300">Staging Area</td>
+                                        <td class="p-2 border border-slate-300">Validación de formato (ej. 8 dígitos)</td>
+                                        <td class="p-2 border border-slate-300">Asignación de ID único (si es nuevo)</td>
+                                        <td class="p-2 border border-slate-300">–</td>
+                                        <td class="p-2 border border-slate-300">–</td>
+                                        <td class="p-2 border border-slate-300">Data Warehouse</td>
+                                        <td class="p-2 border border-slate-300">CRM</td>
+                                        <td class="p-2 border border-slate-300">Data Mart Marketing</td>
+                                        <td class="p-2 border border-slate-300">API de Clientes</td>
+                                        <td class="p-2 border border-slate-300">Segmentación de Campañas</td>
+                                        <td class="p-2 border border-slate-300">Análisis de Retención</td>
+                                        <td class="p-2 border border-slate-300">Personalización Web</td>
+                                        <td class="p-2 border border-slate-300">Soporte al Cliente</td>
+                                        <td class="p-2 border border-slate-300">Informe de Clientes Activos</td>
+                                        <td class="p-2 border border-slate-300">Dashboard de Marketing</td>
+                                        <td class="p-2 border border-slate-300">Reporte de Churn</td>
+                                    </tr>
+                                    <tr class="border-b border-slate-200">
+                                        <td class="p-2 border border-slate-300">Monto_Transaccion</td>
+                                        <td class="p-2 border border-slate-300">Valor Monetario de la Transacción</td>
+                                        <td class="p-2 border border-slate-300">DECIMAL(10,2)</td>
+                                        <td class="p-2 border border-slate-300">Sistema POS</td>
+                                        <td class="p-2 border border-slate-300">Ventas</td>
+                                        <td class="p-2 border border-slate-300">Cajero / Sistema Automático</td>
+                                        <td class="p-2 border border-slate-300">Sistema POS</td>
+                                        <td class="p-2 border border-slate-300">POS_DB.Transacciones</td>
+                                        <td class="p-2 border border-slate-300">Data Lake</td>
+                                        <td class="p-2 border border-slate-300">Conversión de moneda (USD a EUR)</td>
+                                        <td class="p-2 border border-slate-300">Cálculo de impuestos (IVA)</td>
+                                        <td class="p-2 border border-slate-300">Agregación por día y categoría</td>
+                                        <td class="p-2 border border-slate-300">Filtrado de transacciones anuladas</td>
+                                        <td class="p-2 border border-slate-300">Data Mart Ventas</td>
+                                        <td class="p-2 border border-slate-300">Sistema Contable</td>
+                                        <td class="p-2 border border-slate-300">Dashboard de Ventas</td>
+                                        <td class="p-2 border border-slate-300">Modelo de Previsión</td>
+                                        <td class="p-2 border border-slate-300">Análisis de Rentabilidad</td>
+                                        <td class="p-2 border border-slate-300">Auditoría Financiera</td>
+                                        <td class="p-2 border border-slate-300">Reporte de Pérdidas/Ganancias</td>
+                                        <td class="p-2 border border-slate-300">Presupuesto Anual</td>
+                                        <td class="p-2 border border-slate-300">Informe de Ventas Diarias</td>
+                                        <td class="p-2 border border-slate-300">Balance General</td>
+                                        <td class="p-2 border border-slate-300">Reporte de Flujo de Caja</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sección: Gobernanza y Sostenibilidad -->
+            <section id="gobernanza" class="content-section">
+                <h2 class="text-4xl font-bold text-emerald-600 mb-2">Gobernanza y Sostenibilidad del Linaje</h2>
+                <p class="text-lg text-slate-600 mb-8">Establecer el linaje de datos es solo el principio. Para que sea un activo duradero y confiable, es crucial integrarlo en un marco de gobernanza de datos robusto. Esto requiere roles claros, responsabilidades definidas y procesos adecuados para asegurar que el linaje se mantenga actualizado y preciso a lo largo del tiempo.</p>
+                 <h3 class="2xl font-semibold text-slate-700 mb-6">Roles y Responsabilidades Clave</h3>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div id="role-steward" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h4 class="font-bold text-lg text-slate-800">Administrador de Datos (Data Steward)</h4>
+                        <p class="text-slate-600 mt-2">El guardián fundamental de la calidad y el linaje de los datos en su dominio. Responsable de definir, validar y mantener la exactitud de la documentación del linaje.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold text-slate-700">Preguntas para identificar:</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién tiene el conocimiento más profundo y el interés directo en la calidad y el significado de un conjunto de datos específico?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién es el primer punto de contacto para preguntas operativas sobre un dato?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién usa y valida activamente la información generada a partir de estos datos?</p>
+                        </div>
+                    </div>
+                    <div id="role-owner" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h4 class="font-bold text-lg text-slate-800">Propietario de Datos (Data Owner)</h4>
+                        <p class="text-slate-600 mt-2">La máxima autoridad responsable de los datos en su dominio. Aprueba la documentación de linaje, establece políticas de uso y asegura el cumplimiento.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold text-slate-700">Preguntas para identificar:</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién es el ejecutivo o líder de negocio que tiene la responsabilidad final sobre la estrategia y el uso de un dominio de datos?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién aprueba las definiciones críticas de los datos y sus reglas de negocio?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién sería el responsable de asumir riesgos si los datos son incorrectos o no cumplen con la normativa?</p>
+                        </div>
+                    </div>
+                    <div id="role-architect" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h4 class="font-bold text-lg text-slate-800">Arquitecto de Datos</h4>
+                        <p class="text-slate-600 mt-2">Diseña la estructura, los flujos y los modelos de datos de la organización, incorporando la trazabilidad y el linaje desde las fases iniciales del diseño.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold text-slate-700">Preguntas para identificar:</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién define cómo se organizan y fluyen los datos a través de los sistemas?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién es responsable de la visión técnica de la infraestructura de datos y su integración?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién diseña los modelos de datos y las soluciones de almacenamiento?</p>
+                        </div>
+                    </div>
+                     <div id="role-analyst" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h4 class="font-bold text-lg text-slate-800">Analista de Negocio</h4>
+                        <p class="text-slate-600 mt-2">Actúa como puente entre las necesidades del negocio y las capacidades técnicas, definiendo los requisitos de datos y validando que el linaje empresarial refleje la realidad operativa.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold text-slate-700">Preguntas para identificar:</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién traduce las necesidades de negocio en requisitos funcionales y de datos?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién valida que los informes y datos finales cumplen con las expectativas y necesidades del negocio?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién interactúa frecuentemente con los usuarios finales para entender sus necesidades de información?</p>
+                        </div>
+                    </div>
+                     <div id="role-engineer" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h4 class="font-bold text-lg text-slate-800">Ingeniero de Datos</h4>
+                        <p class="text-slate-600 mt-2">Implementa los pipelines de datos, las transformaciones ETL y es una fuente primaria de información para documentar el linaje técnico a nivel de código.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold text-slate-700">Preguntas para identificar:</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién construye y mantiene los procesos que mueven y transforman los datos?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién conoce el código y la lógica técnica de las transformaciones de datos?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién es responsable de la ingesta y preparación de datos para los sistemas analíticos?</p>
+                        </div>
+                    </div>
+                     <div id="role-governance" class="concept-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent cursor-pointer transition-all duration-300">
+                        <h4 class="font-bold text-lg text-slate-800">Equipo de Gobernanza de Datos</h4>
+                        <p class="text-slate-600 mt-2">Supervisa el programa de gobernanza de datos en su conjunto, establece políticas, estándares y asegura la alineación del linaje con la estrategia general de la organización.</p>
+                        <div class="details hidden mt-4 pt-4 border-t border-slate-200">
+                            <p class="font-semibold text-slate-700">Preguntas para identificar:</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién establece las reglas y políticas generales para la gestión de datos en toda la organización?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién asegura que todos los roles trabajen juntos para el linaje y el cumplimiento normativo?</p>
+                            <p class="italic text-slate-500 text-sm mt-1">¿Quién es responsable de la estrategia global de datos y su adopción en la empresa?</p>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Selecciona todas las secciones de contenido y los enlaces de navegación
+    const sections = document.querySelectorAll('.content-section');
+    const navLinks = document.querySelectorAll('.nav-item');
+    
+    // Datos para las explicaciones de los conceptos clave (usados en la sección de Visión General)
+    const conceptData = {
+        trazabilidad: "La Trazabilidad permite seguir el rastro de los datos. Habilitada por el linaje.",
+        linaje: "El Linaje es el registro del viaje de los datos. Ocurre a través del ciclo de vida.",
+        procedencia: "La Procedencia añade contexto histórico a puntos específicos del linaje.",
+        'ciclo-de-vida': "El Ciclo de Vida es el marco temporal y procesal donde operan los demás conceptos."
+    };
+
+    // Nodos de concepto en la sección de Visión General para interacción al pasar el ratón
+    const conceptNodes = document.querySelectorAll('.concept-node-large'); // Changed to target the new class for larger nodes
+    const conceptExplanation = document.getElementById('concept-explanation');
+
+    // Añade eventos para mostrar la explicación del concepto al pasar el ratón
+    conceptNodes.forEach(node => {
+        node.addEventListener('mouseover', () => {
+            const concept = node.dataset.concept;
+            conceptExplanation.textContent = conceptData[concept];
+        });
+        node.addEventListener('mouseout', () => {
+            conceptExplanation.textContent = ''; // Limpia la explicación al quitar el ratón
+        });
+    });
+
+    // Datos detallados para cada etapa del ciclo de vida del dato
+    const lifecycleData = [
+        { id: 'gen', title: 'Generación/Captura', desc: 'Esta es la etapa inicial donde los datos nacen. Pueden ser generados internamente a través de sistemas, procesos, sensores o ingresados manualmente por usuarios. También pueden ser capturados de fuentes externas como clientes, proveedores o la web.', q: '¿Dónde y cómo se originaron los datos? ¿Quién o qué los genera? ¿En qué formato se crean? ¿Dónde se almacenan inicialmente?', meta: 'ID Sistema Origen, Fecha/Hora Captura, Método de Captura, Formato de Datos.', icon: '➕'},
+        { id: 'ing', title: 'Recolección/Ingesta', desc: 'Implica el movimiento de datos desde su punto de origen o captura hacia un repositorio inicial o un sistema de procesamiento. Esta etapa asegura que los datos estén disponibles para su posterior uso y análisis.', q: '¿Cómo se movieron los datos desde su origen? ¿Qué herramientas o tecnologías se usaron para la ingesta? ¿Existen transformaciones iniciales durante la ingesta?', meta: 'Herramienta/Tecnología de Ingesta, Fecha/Hora de Ingesta, Volumen de Datos, Frecuencia de Ingesta.', icon: '📥'},
+        { id: 'proc', title: 'Procesamiento/Transformación', desc: 'Aquí es donde los datos se convierten en información valiosa. Incluye actividades como limpieza, validación, normalización, agregación, enriquecimiento y aplicación de reglas de negocio para preparar los datos para su uso.', q: '¿Qué transformaciones específicas se aplicaron a los datos? ¿Cuál fue la lógica o algoritmo utilizado en cada transformación? ¿Qué campos de entrada se usaron para generar los campos de salida?', meta: 'ID Proceso ETL/ELT, Reglas de Transformación (código/descripción), Campos de Entrada/Salida, Versión de la Lógica.', icon: '🔄'},
+        { id: 'store', title: 'Almacenamiento/Organización', desc: 'Una vez procesados, los datos necesitan un lugar para residir de forma persistente. Esta etapa implica seleccionar y gestionar los sistemas de almacenamiento adecuados (bases de datos, data warehouses, data lakes, etc.) y organizar los datos para un acceso eficiente y seguro.', q: '¿Dónde se almacenan los datos transformados? ¿Cuál es el esquema o estructura de almacenamiento? ¿Cómo se garantiza la seguridad y el acceso a los datos en el almacenamiento?', meta: 'Nombre Sistema de Almacenamiento, Tipo de Almacenamiento (DB, DWH, DL), Nombre de Tabla/Colección/Archivo, Ubicación Física/Lógica.', icon: '🗄️'},
+        { id: 'use', title: 'Uso y Acceso', desc: 'En esta etapa, los datos se consumen activamente para generar informes, dashboards, análisis, alimentar aplicaciones o modelos de inteligencia artificial. Es donde los datos se traducen en insights y apoyan la toma de decisiones.', q: '¿Quiénes son los usuarios o sistemas que acceden a estos datos? ¿Para qué propósito específico se utilizan los datos (informe, análisis, aplicación)? ¿Qué campos de datos se consumen para cada uso?', meta: 'ID Informe/Aplicación/Modelo, Nombre Campo Consumidor, Propósito del Uso, Frecuencia de Acceso, Usuarios/Roles de Acceso.', icon: '📊'},
+        { id: 'share', title: 'Compartición/Intercambio', desc: 'En muchas ocasiones, los datos o la información derivada de ellos necesitan ser compartidos con otras áreas de la organización, socios externos, clientes o reguladores. Esta etapa involucra definir los mecanismos y los controles para una compartición segura y eficiente.', q: '¿Con quién se compartieron los datos (interna/externamente)? ¿A través de qué canales o interfaces se realizó la compartición? ¿Qué formatos se utilizaron para la compartición? ¿Existen acuerdos de intercambio de datos?', meta: 'Destinatario, Método de Transferencia (API, SFTP, Reporte), Formato de Datos Compartidos, Acuerdos de Nivel de Servicio (SLA).', icon: '📤'},
+        { id: 'archive', title: 'Retención/Archivo', desc: 'Dependiendo de las regulaciones, las necesidades del negocio o el valor histórico, algunos datos deben ser retenidos durante un período específico. Esta etapa implica mover los datos a sistemas de archivo a largo plazo, manteniendo su accesibilidad si es necesario para auditorías o referencias futuras.', q: '¿Cuánto tiempo se deben retener estos datos? ¿Existen políticas de retención legales o de negocio? ¿Dónde se archivan los datos y cómo se pueden recuperar si es necesario?', meta: 'Política de Retención, Periodo de Retención, Ubicación de Archivo, Método de Recuperación, Fecha de Archivado.', icon: '📦'},
+        { id: 'del', title: 'Disposición/Destrucción', desc: 'Cuando los datos ya no son necesarios o el período de retención ha expirado, deben ser eliminados de forma segura y definitiva. Esta etapa es crítica para evitar riesgos de seguridad, cumplir con las normativas de privacidad y liberar recursos de almacenamiento.', q: '¿Cuándo y cómo se eliminaron los datos de forma segura? ¿Se puede verificar su destrucción completa? ¿Se cumplen las políticas y regulaciones de eliminación de datos?', meta: 'Método de Destrucción (borrado físico/lógico), Fecha de Destrucción, Certificado de Destrucción (si aplica), Responsable de la Destrucción.', icon: '🗑️'},
+    ];
+
+    // Contenedor de las etapas del ciclo de vida
+    const lifecycleStagesContainer = document.getElementById('lifecycle-stages');
+    // Genera dinámicamente los elementos de las etapas del ciclo de vida
+    lifecycleData.forEach((stage, index) => {
+        const stageEl = document.createElement('div');
+        // Todas las etapas tienen un fondo blanco por defecto y borde gris claro
+        stageEl.className = `lifecycle-stage p-4 rounded-lg border-l-4 border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition-colors duration-200`;
+        stageEl.dataset.index = index;
+        stageEl.dataset.color = stage.color; // Asigna el color como un atributo de datos (ahora todos serán 'slate')
+        stageEl.innerHTML = `<h4 class="font-semibold text-slate-700"><span class="mr-2">${stage.icon}</span>${index + 1}. ${stage.title}</h4>`;
+        lifecycleStagesContainer.appendChild(stageEl);
+    });
+
+    // Añade el evento de clic a las etapas del ciclo de vida para mostrar detalles
+    lifecycleStagesContainer.addEventListener('click', (e) => {
+        const stageEl = e.target.closest('.lifecycle-stage');
+        if (stageEl) {
+            const index = stageEl.dataset.index;
+            const data = lifecycleData[index];
+            
+            // Remueve la clase 'active' de todas las etapas y la añade a la seleccionada
+            document.querySelectorAll('.lifecycle-stage').forEach(el => el.classList.remove('active'));
+            stageEl.classList.add('active');
+
+            // Actualiza el contenido de la sección de detalles del ciclo de vida
+            document.getElementById('lifecycle-title').textContent = data.title;
+            document.getElementById('lifecycle-desc').textContent = data.desc;
+            document.getElementById('lifecycle-content').innerHTML = `
+                <div class="mt-4 space-y-3">
+                    <div>
+                        <p class="font-semibold text-slate-800">Pregunta Clave de Linaje:</p>
+                        <p class="text-slate-600 italic">"${data.q}"</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-slate-800">Metadatos Críticos a Capturar:</p>
+                        <p class="text-slate-600">${data.meta}</p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    // Datos para la metodología de mapeo
+    const methodologyData = [
+        {
+            title: 'Fase 1: Iniciación y Alcance',
+            content: `
+                <h4 class="text-xl font-semibold text-slate-800 mb-3">Definir el "Porqué" y el "Qué"</h4>
+                <p class="text-slate-600 mb-4">Esta fase inicial es crucial para establecer las bases de su proyecto de linaje de datos. Sin una comprensión clara de los objetivos y el alcance, el esfuerzo puede desviarse o no generar el valor esperado.</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                    <li><strong>Identificar Impulsores de Negocio:</strong> ¿Por qué necesitamos el linaje? ¿El objetivo es cumplimiento regulatorio (ej. GDPR, SOX), mejora de la calidad de datos, optimización de procesos, análisis de impacto de cambios o facilitar la auditoría?</li>
+                    <li><strong>Definir Alcance:</strong> Decidir el alcance horizontal (qué sistemas y procesos incluir, de extremo a extremo) y vertical (hasta qué nivel de granularidad – sistema, tabla, columna). Es recomendable empezar pequeño con un proyecto piloto.</li>
+                    <li><strong>Priorizar Informes y KDEs:</strong> Identificar los informes de negocio más críticos y los Elementos de Datos Clave (KDEs) que son fundamentales para la toma de decisiones o el cumplimiento. Estos serán los puntos de partida para el mapeo inverso.</li>
+                </ul>
+            `
+        },
+        {
+            title: 'Fase 2: Recopilación y Análisis',
+            content: `
+                <h4 class="text-xl font-semibold text-slate-800 mb-3">Reunir la Evidencia y Comprender el Flujo</h4>
+                <p class="text-slate-600 mb-4">En esta fase, se recopila toda la información necesaria para entender cómo fluyen y se transforman los datos en su organización. La combinación de diferentes fuentes de información es clave para una visión completa y precisa.</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                    <li><strong>Revisión de Documentación Existente:</strong> Consultar manuales de sistemas, especificaciones de procesos ETL (Extract, Transform, Load), diccionarios de datos, modelos de datos, diagramas de arquitectura y cualquier otra documentación relevante.</li>
+                    <li><strong>Entrevistas con Interesados Clave:</strong> Hablar con analistas de negocio, desarrolladores, ingenieros de datos, arquitectos de datos y dueños de sistemas. Su conocimiento tácito es invaluable para entender las lógicas y los "saltos" de datos no documentados.</li>
+                    <li><strong>Análisis de Código y Consultas:</strong> Revisar consultas SQL, scripts de transformación, código de aplicaciones y configuraciones de herramientas de BI. Esto proporciona el linaje técnico más preciso y revela las transformaciones exactas.</li>
+                    <li><strong>Usar Herramientas Automatizadas (si disponibles):</strong> Emplear catálogos de datos o herramientas de linaje automatizado para escanear metadatos, inferir relaciones y generar flujos de datos. Esto puede acelerar significativamente el proceso.</li>
+                </ul>
+            `
+        },
+        {
+            title: 'Fase 3: Mapeo y Documentación',
+            content: `
+                <h4 class="text-xl font-semibold text-slate-800 mb-3">Construir el Mapa Detallado del Linaje</h4>
+                <p class="text-slate-600 mb-4">Con la información recopilada, es momento de construir el mapa del linaje. Esta fase implica documentar sistemáticamente el recorrido de los datos, desde los informes hasta sus fuentes, detallando cada transformación.</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                    <li><strong>Mapeo Origen-Destino (Source-to-Target Mapping - STM):</strong> Para cada KDE o campo de informe identificado, rastrear su linaje hacia atrás, identificando todos los sistemas, tablas y campos intermedios hasta llegar a su fuente original.</li>
+                    <li><strong>Documentar Lógica de Transformación:</strong> Capturar de manera precisa todos los cálculos, filtros, agregaciones, uniones y reglas de negocio que se aplican a los datos en cada "salto" o etapa de procesamiento. Esto es crítico para entender la calidad y el significado del dato final.</li>
+                    <li><strong>Linaje a Nivel de Columna:</strong> Para los KDEs más críticos o datos regulados, realizar el mapeo a nivel de campo individual (columna a columna) para obtener la máxima granularidad y precisión.</li>
+                    <li><strong>Uso de Plantillas Estandarizadas:</strong> Utilizar las plantillas proporcionadas (o similares) para asegurar la consistencia y completitud de la documentación.</li>
+                </ul>
+            `
+        },
+        {
+            title: 'Fase 4: Elección de Enfoque',
+            content: `
+                <h4 class="text-xl font-semibold text-slate-800 mb-3">Seleccionar la Estrategia de Implementación</h4>
+                <p class="text-slate-600 mb-4">La forma en que se implementa el mapeo del linaje puede variar significativamente en términos de esfuerzo, precisión y escalabilidad. Es vital elegir el enfoque que mejor se adapte a las necesidades y recursos de su organización.</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                    <li><strong>Enfoque Manual:</strong> Utilizar hojas de cálculo (como las plantillas que verá) y herramientas de diagramación manuales. Es de bajo costo inicial y flexible, pero propenso a errores, difícil de mantener y no escalable para grandes volúmenes de datos o sistemas complejos.</li>
+                    <li><strong>Enfoque Semiautomatizado:</strong> Combinar herramientas automatizadas para extraer metadatos (ej. de bases de datos) con un esfuerzo manual significativo para validar, enriquecer y conectar los flujos de linaje. Ofrece un buen equilibrio para organizaciones en crecimiento.</li>
+                    <li><strong>Enfoque Totalmente Automatizado:</strong> Implementar herramientas especializadas de linaje de datos que escanean, analizan código (SQL, ETL, scripts) y generan automáticamente los mapas de linaje. Es el más escalable y preciso, ideal para entornos complejos y regulados, pero con una mayor inversión inicial.</li>
+                </ul>
+            `
+        },
+        {
+            title: 'Fase 5: Validación y Revisión',
+            content: `
+                <h4 class="text-xl font-semibold text-slate-800 mb-3">Asegurar la Precisión y Consistencia</h4>
+                <p class="text-slate-600 mb-4">Una vez que el linaje ha sido mapeado, la validación es una fase crítica para asegurar su precisión y fiabilidad. Un linaje incorrecto puede llevar a decisiones erróneas y a la pérdida de confianza en los datos.</p>
+                <ul class="list-disc list-inside space-y-2 text-slate-600">
+                    <li><strong>Validar el Linaje con Fuentes:</strong> Comparar la documentación del linaje con los sistemas reales, el código fuente y, cuando sea posible, realizar muestreo de datos para verificar que el flujo documentado coincide con el flujo real.</li>
+                    <li><strong>Revisiones con Interesados:</strong> Presentar el linaje documentado a los usuarios de negocio, dueños de datos, equipos técnicos y auditores. Sus comentarios y validación son esenciales para asegurar que el linaje es comprensible y preciso desde todas las perspectivas.</li>
+                    <li><strong>Iterar y Refinar:</strong> El proceso de linaje es iterativo. Recopilar comentarios, identificar discrepancias y refinar la documentación hasta alcanzar un consenso y un alto nivel de confianza.</li>
+                    <li><strong>Establecer un Proceso de Cambio:</strong> Definir cómo se actualizará el linaje cuando los sistemas, procesos o transformaciones de datos cambien.</li>
+                </ul>
+            `
+        }
+    ];
+
+    // Contenedores para los pasos y el contenido de la metodología
+    const stepsContainer = document.getElementById('methodology-steps');
+    const contentsContainer = document.getElementById('methodology-contents');
+    
+    // Genera dinámicamente los pasos y su contenido
+    methodologyData.forEach((step, index) => {
+        const stepEl = document.createElement('div');
+        stepEl.className = 'step p-4 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-slate-100';
+        stepEl.dataset.index = index;
+        stepEl.innerHTML = `
+            <div class="flex items-center">
+                <div class="step-circle w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 mr-4 transition-colors duration-300">${index + 1}</div>
+                <h3 class="step-title font-semibold text-slate-700 transition-colors duration-300">${step.title}</h3>
+            </div>
+        `;
+        stepsContainer.appendChild(stepEl);
+
+        const contentEl = document.createElement('div');
+        contentEl.className = 'step-content';
+        contentEl.innerHTML = step.content;
+        contentsContainer.appendChild(contentEl);
+    });
+
+    // Selecciona todos los pasos y el contenido de los pasos
+    const steps = document.querySelectorAll('.step');
+    const stepContents = document.querySelectorAll('.step-content');
+
+    // Función para mostrar un paso específico
+    function showStep(index) {
+        steps.forEach((step, i) => step.classList.toggle('active', i == index));
+        stepContents.forEach((content, i) => content.classList.toggle('active', i == index));
+    }
+
+    // Añade eventos de clic a los pasos para cambiar el contenido
+    steps.forEach(step => {
+        step.addEventListener('click', () => showStep(step.dataset.index));
+    });
+    showStep(0); // Muestra el primer paso por defecto
+
+    // Selecciona todas las tarjetas de concepto (Trazabilidad, Linaje, Procedencia, Ciclo de Vida)
+    const conceptCards = document.querySelectorAll('#conceptos .grid:last-of-type .concept-card');
+    // Añade eventos de clic a las tarjetas de concepto para expandir/contraer detalles
+    conceptCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const wasActive = card.classList.contains('active');
+            // Cierra todas las tarjetas
+            conceptCards.forEach(c => {
+                c.classList.remove('active');
+                c.querySelector('.details').classList.add('hidden');
+            });
+            // Si la tarjeta clicada no estaba activa, la abre
+            if (!wasActive) {
+                card.classList.add('active');
+                card.querySelector('.details').classList.remove('hidden');
+            }
+        });
+    });
+
+    // Selecciona las nuevas tarjetas de tipos de datos
+    const dataTypeCards = document.querySelectorAll('.data-type-card');
+
+    // Añade eventos de clic a las tarjetas de tipos de datos para expandir/contraer detalles
+    dataTypeCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const wasActive = card.classList.contains('active');
+            // Cierra todas las tarjetas de tipos de datos
+            dataTypeCards.forEach(c => {
+                c.classList.remove('active');
+            });
+            // Si la tarjeta clicada no estaba activa, la abre
+            if (!wasActive) {
+                card.classList.add('active');
+            }
+        });
+    });
+
+
+    // Selecciona los botones de pestaña y el contenido de las pestañas
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    // Función para mostrar una pestaña específica
+    function showTab(tabId) {
+        tabButtons.forEach(button => {
+            button.classList.toggle('active', button.dataset.tab === tabId);
+        });
+        tabContents.forEach(content => {
+            content.classList.toggle('active', content.id === `tab-${tabId}`);
+        });
+    }
+
+    // Añade eventos de clic a los botones de pestaña
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            showTab(button.dataset.tab);
+        });
+    });
+    showTab('approaches'); // Muestra la primera pestaña por defecto
+
+    // Función para mostrar una sección de contenido basada en el hash de la URL
+    function showSection(hash) {
+        const id = hash.substring(1);
+        sections.forEach(section => {
+            section.classList.toggle('active', section.id === id);
+        });
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.hash === hash);
+        });
+    }
+    
+    // Añade eventos de clic a los enlaces de navegación para cambiar de sección
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const hash = this.hash;
+            history.pushState(null, null, hash); // Actualiza la URL sin recargar
+            showSection(hash);
+        });
+    });
+
+    // Muestra la sección inicial basada en el hash de la URL o por defecto
+    const initialHash = window.location.hash || '#inicio';
+    showSection(initialHash);
+    
+    // Maneja el evento 'popstate' (navegación hacia atrás/adelante del navegador)
+    window.addEventListener('popstate', () => {
+        const hash = window.location.hash || '#inicio';
+        showSection(hash);
+    });
+    
+    // Configuración y renderizado del gráfico de comparación de enfoques de linaje
+    let approachesChart;
+    const approachesChartCtx = document.getElementById('approachesChart').getContext('2d');
+    approachesChart = new Chart(approachesChartCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Manual', 'Semiautomatizado', 'Totalmente Automatizado'],
+            datasets: [
+                {
+                    label: 'Esfuerzo Requerido',
+                    data: [3, 2, 1], /* 3: Alto, 2: Medio, 1: Bajo */
+                    backgroundColor: 'rgba(107, 114, 128, 0.6)', /* slate-500 */
+                    borderColor: 'rgba(107, 114, 128, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Precisión / Fiabilidad',
+                    data: [1, 2, 3], /* 1: Bajo, 2: Medio, 3: Alto */
+                    backgroundColor: 'rgba(5, 150, 105, 0.6)', /* emerald-600 */
+                    borderColor: 'rgba(5, 150, 105, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Escalabilidad',
+                    data: [1, 2, 3], /* 1: Baja, 2: Media, 3: Alta */
+                    backgroundColor: 'rgba(107, 114, 128, 0.6)', /* slate-500 */
+                    borderColor: 'rgba(107, 114, 128, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (value === 1) return 'Bajo';
+                            if (value === 2) return 'Medio';
+                            if (value === 3) return 'Alto';
+                            return '';
+                        },
+                        stepSize: 1,
+                        max: 3,
+                    },
+                     title: {
+                        display: true,
+                        text: 'Nivel'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Comparación de Enfoques de Linaje',
+                    font: { size: 16 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const value = context.parsed.y;
+                            if (value === 1) label += 'Bajo';
+                            if (value === 2) label += 'Medio';
+                            if (value === 3) label += 'Alto';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+</body>
+</html>
